@@ -32,7 +32,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     // If you are using MySQL 5.7, use CONVERT(u.userId, CHAR) instead of CAST.
 @Query("SELECT u FROM User u WHERE " +
            "LOWER(u.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
-           "STR(u.userId) LIKE CONCAT('%', :query, '%') OR " + // <-- FIX APPLIED: Using STR()
+           //"STR(u.userId) LIKE CONCAT('%', :query, '%') OR " + // <-- FIX APPLIED: Using STR()
+           "CAST(u.userId AS text) LIKE CONCAT('%', :query, '%') OR " +
            "LOWER(u.contactNumber) LIKE LOWER(CONCAT('%', :query, '%'))")
     Page<User> findBySearchQuery(@Param("query") String query, Pageable pageable);
     // You no longer need findAllByOrderByMembershipStatusAsc/Desc as findAll(Pageable) handles it.

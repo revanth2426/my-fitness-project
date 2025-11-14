@@ -87,6 +87,7 @@ public class SecurityConfig {
             "http://localhost:5173",
             "http://127.0.0.1:5173",
             "https://srfitness-admin.netlify.app", // Placeholder for your main domain
+            "https://my-fitness-project.netlify.app", // <-- ADD THIS EXACT DOMAIN
             "https://*.netlify.app" // Allow for Netlify's continuous deployment URLs (safer than *)
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));

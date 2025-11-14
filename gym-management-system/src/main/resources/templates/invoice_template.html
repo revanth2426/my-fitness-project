@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Receipt</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .invoice-box { max-width: 800px; margin: auto; padding: 30px; border: 1px solid #eee; box-shadow: 0 0 10px rgba(0, 0, 0, 0.15); font-size: 16px; line-height: 24px; color: #555; }
+        .invoice-box table { width: 100%; line-height: inherit; text-align: left; border-collapse: collapse; }
+        .invoice-box table td { padding: 5px; vertical-align: top; }
+        .invoice-box table tr td:nth-child(2) { text-align: right; }
+        .invoice-box table tr.top table td { padding-bottom: 20px; }
+        .invoice-box table tr.top table td.title { font-size: 45px; line-height: 45px; color: #333; }
+        .invoice-box table tr.information table td { padding-bottom: 40px; }
+        .invoice-box table tr.heading td { background: #eee; border-bottom: 1px solid #ddd; font-weight: bold; padding: 5px; }
+        .invoice-box table tr.item td { border-bottom: 1px solid #eee; padding: 5px; }
+        .invoice-box table tr.item.last td { border-bottom: none; }
+        .invoice-box table tr.total td:nth-child(2) { border-top: 2px solid #eee; font-weight: bold; }
+        .signature { margin-top: 50px; text-align: right; }
+        .right-align { text-align: right; }
+        .invoice-details { text-align: right; }
+        .seller-details, .buyer-details { width: 50%; }
+        .item-table { width: 100%; }
+        .item-table th, .item-table td { text-align: right; }
+        .item-table th:first-child, .item-table td:first-child { text-align: left; }
+    </style>
+</head>
+<body>
+    <div class="invoice-box">
+        <table>
+            <tr class="top">
+                <td colspan="2">
+                    <table>
+                        <tr>
+                            <td class="title">
+                                <img th:src="${logoUrl}" style="width:100%; max-width:300px;">
+                            </td>
+                            <td class="invoice-details">
+                                Invoice #: <span th:text="${payment.paymentId}">12345</span><br>
+                                Created: <span th:text="${payment.paymentDate}">2025-07-29</span><br>
+                                Order #: <span th:text="${payment.paymentId}">12345</span>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr class="information">
+                <td colspan="2">
+                    <table>
+                        <tr>
+                            <td class="seller-details">
+                                <strong>Seller Name:</strong> <span th:text="${gymInfo.name}">SR FITNESS GYM</span><br>
+                                <strong>Address:</strong> <span th:text="${gymInfo.address}">123 Gym Road, Fitness City, State 12345</span><br>
+                                <span th:text="${gymInfo.address}">123 Gym Road, Fitness City, State 12345</span><br>
+                                <strong>Phone:</strong> <span th:text="${gymInfo.phone}">+91 98765 43210</span><br>
+                                <strong>Email:</strong> <span th:text="${gymInfo.email}">info@srfitness.com</span>
+                            </td>
+                            <td class="buyer-details right-align">
+                                <strong>Billing To:</strong><br>
+                                <span th:text="${payment.userName}">Member Name</span><br>
+                                <span th:text="${'Member ID: ' + payment.userId}">Member ID: 12345</span><br>
+                                </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        
+        <table class="item-table">
+            <tr class="heading">
+                <th style="width: 40%;">Description</th>
+                <th style="width: 10%;">Quantity</th>
+                <th style="width: 15%;">Unit Price</th>
+                <th style="width: 10%;">Discount</th>
+                <th style="width: 15%;">Net Amount</th>       
+                <th style="width: 10%;">Total Amount</th>
+            </tr>
+            <tr class="item">
+                <td>
+                    <span th:text="${payment.membershipPlanNameFormatted}">Gym Membership (Jan 2025 - Feb 2025)</span>
+                </td>
+                <td>1</td>
+                <td><span th:text="${'INR ' + #numbers.formatDecimal(payment.totalMembershipFee, 1, 2)}">INR 1000.00</span></td>
+                <td><span th:text="${'INR ' + #numbers.formatDecimal(0, 1, 2)}">INR 0.00</span></td>
+                <td><span th:text="${'INR ' + #numbers.formatDecimal(payment.totalMembershipFee, 1, 2)}">INR 1000.00</span></td>
+                <td><span th:text="${'INR ' + #numbers.formatDecimal(payment.totalMembershipFee, 1, 2)}">INR 1000.00</span></td>
+            </tr>
+            <tr th:if="${payment.dueAmount > 0}" class="item last">
+                <td colspan="5" style="text-align: right; font-weight: bold;">Due Payment Received:</td>
+                <td><span th:text="${'INR ' + #numbers.formatDecimal(payment.amount, 1, 2)}">INR 500.00</span></td>
+            </tr>
+             </table>
+        
+        <div class="signature">
+            <p><strong>Amount in Words:</strong> <span th:text="${amountInWords}">One Thousand Five Hundred Rupees Only</span></p>
+            <p>For <span th:text="${gymInfo.name}">SR FITNESS GYM</span>:</p>
+            <br><br><br>
+            <p>Authorised Signatory</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,215 @@
+/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom CSS for Sidebar Transitions (Gemini-like) */
+
+:root {
+  --sidebar-expanded-width: 256px; /* w-64 */
+  --sidebar-collapsed-width: 64px; /* w-16 */
+  --topbar-height: 64px; /* h-16 */
+}
+
+/* FIX: Ensure HTML, Body, and #root take full height to allow min-h-screen to work */
+html, body, #root {
+  height: 100% !important; /* Force height to 100% */
+  min-height: 100vh !important; /* Force minimum height to full viewport height */
+  margin: 0 !important; /* Remove default margins */
+  padding: 0 !important; /* Remove default padding */
+  overflow-x: hidden !important; /* Prevent horizontal scrolling of the entire page */
+}
+
+/* Base sidebar styling */
+.app-sidebar {
+  /* Width controlled by JS classes */
+  transition: width 0.3s ease-in-out, transform 0.3s ease-in-out;
+  position: fixed; /* Always fixed relative to viewport */
+  top: 0;
+  left: 0;
+  height: 100vh; /* Full viewport height */
+  z-index: 20; /* Keep above main content */
+  background-color: #1f2937; /* gray-800 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* Hide overflowing text/content when collapsed */
+}
+
+/* Desktop Sidebar States */
+/* Default desktop state is collapsed (icon-only) if not explicitly opened */
+.app-sidebar.sidebar-collapsed {
+  width: var(--sidebar-collapsed-width);
+}
+
+/* Desktop expanded state (when isSidebarOpen is true OR isHovering is true) */
+.app-sidebar.sidebar-expanded {
+  width: var(--sidebar-expanded-width);
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 767px) { /* Tailwind's md breakpoint is 768px */
+  /* Mobile sidebar width is always expanded width when open */
+  .app-sidebar {
+    width: var(--sidebar-expanded-width); /* Fixed width for mobile when open */
+    transform: translateX(-100%); /* Hidden by default on mobile */
+  }
+
+  /* Mobile sidebar explicitly slides into view when isSidebarOpen is true */
+  .app-sidebar.sidebar-expanded { /* Using sidebar-expanded class for mobile open */
+    transform: translateX(0); /* Slides into view */
+  }
+}
+
+/* Styling for the sidebar header container */
+.app-sidebar > div:first-child { /* Targets the first div within app-sidebar (which is the header) */
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* To push logo/hamburger to left and toggle button to right */
+    padding: 1rem; /* p-4 in Tailwind */
+    box-sizing: border-box; /* Include padding in element's total width/height */
+}
+
+
+/* For sidebar content: text visibility and position within the link */
+/* This now applies to the "Gym Central" span */
+.app-sidebar .sidebar-header span {
+  opacity: 1; /* Default to visible */
+  white-space: nowrap;
+  transition: opacity 0.3s ease-in-out; /* Smooth opacity transition */
+}
+
+/* Hide "Gym Central" text when sidebar is collapsed (desktop) */
+.app-sidebar.sidebar-collapsed .sidebar-header span:first-child {
+    opacity: 0;
+    pointer-events: none;
+    width: 0; /* Collapse width for the text */
+}
+
+/* Show hamburger icon when sidebar is collapsed on desktop */
+.app-sidebar.sidebar.collapsed .sidebar-header span.w-full.flex.justify-center {
+    opacity: 1;
+    pointer-events: auto;
+    width: auto; /* Allow width for the icon */
+}
+
+
+/* For menu item text, keep previous hiding logic */
+.app-sidebar.sidebar-collapsed .nav-text,
+.app-sidebar.sidebar-collapsed .logout-text {
+  opacity: 0; /* Hide text */
+  width: 0; /* Collapse width to hide text */
+  margin-left: 0 !important; /* Ensure no margin pushes content */
+  pointer-events: none; /* Prevent text from being selectable/clickable when hidden */
+}
+
+/* Nav item link styling - ensures full area is clickable and icon/text spacing is consistent */
+.app-sidebar nav ul li a {
+  padding: 0.75rem 1rem; /* py-3 px-4, consistent padding for hover area */
+  display: flex;
+  align-items: center;
+  overflow: hidden; /* Hide overflowing text */
+  position: relative; /* For tooltip positioning */
+}
+
+/* Nav icon margin for spacing between icon and text */
+.app-sidebar nav ul li a svg {
+    margin-right: 0.75rem; /* ml-3 from App.tsx link */
+    transition: margin-right 0.3s ease-in-out;
+}
+
+/* Remove nav icon margin when text is hidden (desktop collapsed) */
+.app-sidebar.sidebar-collapsed nav ul li a svg {
+    margin-right: 0; /* Remove margin to pull icon to left edge */
+}
+
+/* Tooltip for collapsed state */
+.app-sidebar nav ul li a .tooltip {
+  position: absolute;
+  left: var(--sidebar-collapsed-width); /* Position right at the edge of the collapsed sidebar */
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(55, 65, 81, 0.9); /* gray-700 with opacity */
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem; /* text-xs */
+  opacity: 0;
+  visibility: hidden;
+  white-space: nowrap;
+  pointer-events: none; /* Do not block clicks */
+  transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+  z-index: 50; /* Ensure tooltip is on top */
+}
+
+/* Show tooltip on hover when sidebar is collapsed */
+.app-sidebar.sidebar-collapsed nav ul li a:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Styling for the toggle button within the sidebar header */
+.sidebar-pin-button { /* Adjusted class name for clarity */
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0.25rem; /* Small padding around the icon */
+  border-radius: 9999px; /* Full rounded for pill shape */
+  transition: all 0.2s ease-in-out; /* Smooth transition for color/transform */
+}
+
+
+/* Hide the pin button when sidebar is collapsed on desktop, as it will be replaced by the hamburger */
+.app-sidebar.sidebar-collapsed .sidebar-pin-button {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(100%); /* Slide out of view */
+}
+
+/* For main content margin, adjusting based on sidebar state */
+.main-content {
+    transition: margin-left 0.3s ease-in-out;
+}
+
+/* --- NEW CSS for DraggableScannerWindow --- */
+.draggable-window {
+  width: 300px; /* Fixed width for the window */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  resize: none; /* Disable manual resizing for now */
+  z-index: 1000; 
+  user-select: none; /* Prevent text selection during drag */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.draggable-window .draggable-header {
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+.draggable-window .draggable-header:active {
+  cursor: grabbing;
+}
+
+/* Style for the fixed-height dashboard QR status block (no longer used for camera, but kept in case it's repurposed) */
+.qr-status-block {
+  min-height: 450px; /* Consistent height for the dashboard block */
+  display: flex; /* Ensure inner content is centered */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-status-block > p { /* Target the text inside */
+    padding: 1rem; /* Match p-4 from Tailwind */
+    border: 1px solid #d1d5db; /* gray-300 */
+    border-radius: 0.375rem; /* rounded-md */
+    background-color: #f3f4f6; /* gray-100 */
+    text-align: center;
+}
